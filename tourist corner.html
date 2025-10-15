@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tourist Corner - Full Site Demo</title>
+    
+    <style>
+        /* --- General Reset and Base Styles --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        body { background: #f4f7f6; display: flex; justify-content: center; min-height: 100vh; padding: 20px; }
+
+        /* --- Main Container & Page Management --- */
+        #site-container {
+            width: 100%;
+            max-width: 900px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+        }
+
+        .page-view { display: none; padding: 20px; }
+        .page-view.active { display: block; }
+        
+        /* --- Shared Component Styles --- */
+        .header h1 { font-size: 2em; color: #007bff; margin-bottom: 25px; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; text-align: center; }
+        
+        .input-group { text-align: left; margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #495057; font-size: 0.9em; }
+        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 1em; }
+        
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 30px; }
+        .nav-buttons .btn-action { 
+            padding: 12px 20px; 
+            border: none; 
+            border-radius: 4px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            text-decoration: none; 
+            transition: background 0.3s;
+            color: white; 
+            min-width: 150px;
+            text-align: center;
+        }
+        .btn-primary { background: #28a745; }
+        .btn-primary:hover { background: #218838; }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { background: #5a6268; }
+        .btn-danger { background: #dc3545; }
+        .btn-danger:hover { background: #c82333; }
+        .btn-info { background: #007bff; }
+        .btn-info:hover { background: #0056b3; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+        
+        /* --- Page Specific Styles --- */
+        
+        /* Login/Register */
+        #login-register { max-width: 400px; margin: 0 auto; }
+        .form-toggle button { flex-grow: 1; padding: 10px 15px; border: none; background: #e9ecef; color: #6c757d; }
+        .form-toggle button.active { background: #007bff; color: white; }
+        #login-form, #register-form { display: none; }
+        #login-form.active, #register-form.active { display: block; }
+        
+        /* Emergency */
+        .emergency-call-section { background: #f8d7da; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
+        
+        /* Services */
+        .card-grid { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+        .service-card { border: 1px solid #e9ecef; border-radius: 8px; padding: 25px; width: 100%; max-width: 300px; text-align: center; }
+        .service-card .icon { font-size: 3em; margin-bottom: 15px; }
+        
+        /* Itinerary Confirmation */
+        .review-card { border: 2px solid #007bff; border-radius: 10px; padding: 20px; margin-bottom: 25px; background: #f0f7ff; }
+        .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #ced4da; }
+        .agreement { margin-top: 20px; text-align: center; }
+        
+        /* Payment/Confirmation */
+        .summary-box { background: #f8f9fa; padding: 25px; margin-bottom: 25px; text-align: left; }
+        .total-row { font-size: 1.2em; font-weight: bold; color: #dc3545; border-top: 2px solid #dc3545; padding-top: 10px; }
+
+        /* Success/Ticket */
+        .success-box { background: #d4edda; color: #155724; border-radius: 12px; padding: 30px; margin-bottom: 30px; }
+        .confirmation-id { font-size: 1.2em; font-weight: bold; display: block; margin: 15px 0; padding: 10px; background: #c3e6cb; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<div id="site-container">
+
+    <div id="p-login" class="page-view active">
+        <div id="login-register">
+            <header class="header"><h1>Tourist Corner</h1></header>
+            <div class="form-toggle">
+                <button id="login-tab" class="active" onclick="switchForm('login')">Login</button>
+                <button id="register-tab" onclick="switchForm('register')">Register</button>
+            </div>
+            <div class="form-container">
+                <form id="login-form" class="active" onsubmit="navigate('p-emergency'); return false;">
+                    <h2>Welcome Back</h2>
+                    <div class="input-group"><label>Email</label><input type="email" required></div>
+                    <div class="input-group"><label>Password</label><input type="password" required></div>
+                    <button type="submit" class="btn-primary" style="width:100%;">Login</button>
+                </form>
+                <form id="register-form" onsubmit="navigate('p-emergency'); return false;">
+                    <h2>Create Account</h2>
+                    <div class="input-group"><label>Full Name</label><input type="text" required></div>
+                    <div class="input-group"><label>Email</label><input type="email" required></div>
+                    <div class="input-group"><label>Password</label><input type="password" required></div>
+                    <button type="submit" class="btn-primary" style="width:100%;">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="p-emergency" class="page-view">
+        <header class="header"><h1>Tourist Corner</h1></header>
+        <div class="emergency-call-section">
+            <p style="color: #721c24; margin-bottom: 15px; font-weight:bold;">**Immediate Help:** Tap below to call emergency services.</p>
+            <a href="tel:911" class="btn-action btn-danger">🚨 Call Local Emergency (911)</a>
+        </div>
+        <form onsubmit="navigate('p-services'); return false;">
+            <h2>Emergency Information</h2>
+            <div class="input-group"><label>Primary Contact Name</label><input type="text" required></div>
+            <div class="input-group"><label>Primary Contact Phone</label><input type="tel" required></div>
+            <div class="nav-buttons">
+                <a href="#" class="btn-action btn-secondary" onclick="navigate('p-dashboard'); return false;">Skip for now</a>
+                <button type="submit" class="btn-action btn-info">Continue to Services</button>
+            </div>
+        </form>
+    </div>
+    <div id="p-services" class="page-view">
+        <header class="header"><h1>Tourist Corner</h1></header>
+        <h2>How Would You Like to Book?</h2>
+        <div class="card-grid">
+            <div class="service-card"><div class="icon" style="color:#28a745;">✈️</div><h3>Online Services (DIY)</h3>
+                <a href="#" class="btn-action btn-primary" style="width:100%;" onclick="navigate('p-online-class'); return false;">Start Online Booking</a>
+            </div>
+            <div class="service-card"><div class="icon" style="color:#ffc107;">🧑‍💼</div><h3>Offline/Agent Services</h3>
+                <a href="#" class="btn-action" style="background:#ffc107; color:#343a40; width:100%;" onclick="navigate('p-offline-step1'); return false;">Connect with an Agent</a>
+            </div>
+        </div>
+    </div>
+    <div id="p-online-class" class="page-view">
+        <header class="header"><h1>Tourist Corner</h1></header>
+        <h2>Select Travel Class</h2>
+        <div class="card-grid">
+             <div class="service-card"><div class="icon" style="color:#17a2b8;">💺</div><h3>Economy</h3><a href="#" class="btn-action btn-primary" style="width:100%;" onclick="navigate('p-online-destination'); return false;">Select</a></div>
+             <div class="service-card"><div class="icon" style="color:#007bff;">🥂</div><h3>First Class</h3><a href="#" class="btn-action btn-primary" style="width:100%;" onclick="navigate('p-online-destination'); return false;">Select</a></div>
+             <div class="service-card"><div class="icon" style="color:#ffc107;">💎</div><h3>Luxury</h3><a href="#" class="btn-action btn-primary" style="width:100%;" onclick="navigate('p-online-destination'); return false;">Select</a></div>
+        </div>
+        <a href="#" class="btn-action btn-secondary" style="margin-top:20px;" onclick="navigate('p-services'); return false;">← Back</a>
+    </div>
+    <div id="p-online-destination" class="page-view">
+        <header class="header"><h1>Tourist Corner</h1></header>
+        <form onsubmit="navigate('p-online-info'); return false;">
+            <h2>Where is Your Travel Destination?</h2>
+            <div class="grid-2">
+                <div class="input-group"><label>Country</label><select required><option>India</option><option>USA</option></select></div>
+                <div class="input-group"><label>State/Region</label><select required><option>Tamil Nadu</option><option>California</option></select></div>
+                <div class="input-group"><label>District</label><select required><option>Chennai</option><option>Los Angeles</option></select></div>
+                <div class="input-group"><label>City (Final Destination)</label><select required><option>Chennai City</option><option>Santa Monica</option></select></div>
+            </div>
+            <div class="nav-buttons">
+                <a href="#" class="btn-action btn-secondary" onclick="navigate('p-online-class'); return false;">← Back to Class</a>
+                <button type="submit" class="btn-action btn-info">Next: Info →</button>
+            </div>
+        </form>
+    </div>
+    <div id="p-online-info" class="page-view">
+        <header class="header"><h1>Tourist Corner</h1></header>
+        <h2 style="color:#007bff;">✨ Chennai, India ✨</h2>
+        <div style="text-align:center;">
+            <p>Ready to discover the Gateway to South India?</p>
+            <div class="card-grid" style="margin-top:20px;"><div style="height:120px; width:150px; background:#ced4da;">Marina Beach</div><div style="height:120px; width:150px; background:#ced4da;">Temple</div></div>
+            <div style="height:200px; background:#343a40; margin:20px 0; color:white; display:flex; align-items:center; justify-content:center;">[Placeholder: Destination Video]</div>
+        </div>
+        <div class="nav-buttons">
+            <a href="#" class="btn-action btn-secondary" onclick="navigate('p-online-destination'); return false;">← Change Destination</a>
+            <a href="#" class="btn-action btn-primary" onclick="navigate('p-online-traveler-count'); return false;">Continue to Dates & Travelers →</a>
+        </div>
+    </div>
+    <div id="p-online-traveler-count" class="page-view">
+        <header class="header"><h1>Tourist Corner</h1></header>
+        <form onsubmit="navigate('p-online-traveler-details'); return false;">
+            <h2>When & Who is Going?</h2>
+            <h3 style="margin-top:20px;">Travel Dates</h3>
+            <div class="grid-2">
+                <div class="input-group"><label>Start Date</label><input type="date" required></div>
+                <div class="input-group"><label>End Date</label><input type="date" required></div>
+                <div class="input-group"><label>Total Days</label><input type="number" required></div>
+                <div class="input-group"><label>Total Nights</label><input type="number" required></div>
+            </div>
+            <h3 style="margin-top:20px;">Travelers</h3>
+            <div class="grid-2">
+                <div class="input-group"><label>Adults (13+)</label><input type="number" value="1" min="1" required></div>
+                <div class="input-group"><label>Children (0-12)</label><input type="number" value="0" min="0"></div>
+            </div>
+            <div class="nav-buttons">
+                <a href="#" class="btn-action btn-secondary" onclick="navigate('p-online-info'); return false;">← Back to Info</a>
+                <button type="submit" class="btn-action btn-info">Next: Full Details</button>
+            </div>
+        </form>
+    </div>
+    <div id="p-online-traveler-details" class="page-view">
+        <header class="header"><h1>Tourist Corner</h1></header>
+        <form onsubmit="navigate('p-online-packages'); return false;">
+            <h2>Enter Details for All Travelers</h2>
+            <div class="input-group"><label>Traveler 1 Name</label><input type="text" placeholder="Full Name (as per ID)" required></div>
+            <div class="grid-2">
+                <div class="input-group"><label>Date of Birth</label><input type="date" required></div>
+                <div class="input-group"><label>Nationality</label><input type="text" placeholder="Country" required></div>
+            </div>
+            <div class="nav-buttons">
+                <a href="#" class="btn-action btn-secondary" onclick="navigate('p-online-traveler-count'); return false;">← Back to Dates</a>
+                <button type="submit" class="btn-action btn-info">Next: Hotel & Packages</button>
+            </div>
+        </form>
+    </div>
+    <div id="p-online-packages" class="page-view">
+        <header class="header"><h1>Tourist Corner</h1></header>
+        <form onsubmit="navigate('p-online-transport'); return false;">
+            <h2>Customize Your Stay and Dining</h2>
+            <div class="input-group"><label>Select Hotel</label><select required><option>The Grand Legacy (5-Star)</option></select></div>
+            <div class="input-group"><label>Dining Package</label><select><option>No Dining</option><option>Half Board (+ $80)</option></select></div>
+            <div class="nav-buttons">
+                <a href="#" class="btn-action btn-secondary" onclick="navigate('p-online-traveler-details'); return false;">← Back to Travelers</a>
+                <button type="submit" class="btn-action btn-info">Next: Transport Selection</button>
+            </div>
+        </form>
+    </div>
+    <div id="p-online-transport" class="page-view">
+        <header class="header"><h1>Tourist Corner</h1></header>
+        <form onsubmit="navigate('p-online-itinerary-suggest'); return false;">
+            <h2>Select Transport Options</h2>
+            <div class="input-group"><label>Outbound Journey Mode</label><select required><option>Flight (Default)</option><option>Train</option></select></div>
+            <div class="input-group"><label>Local Transit Choice</label><select><option>Rental Car (+ $200)</option><option>Self-Arrange</option></select></div>
+            <div class="nav-buttons">
+                <a href="#" class="btn-action btn-secondary" onclick="navigate('p-online-packages'); return false;">← Back to Packages</a>
+                <button type="submit" class="btn-action btn-info">Next: Itinerary Suggestions</button>
+            </div>
+        </form>
+    </div>
+    <div id="p-online-itinerary-suggest" class="page-view">
+        <header class="header"><h1>Tourist Corner</h1></header>
+        <form onsubmit="navigate('p-online-itinerary-confirm'); return false;">
+            <h2>Suggested Routes</h2>
+            <div style="text-align:center;">
+                <p>Day 1: Heritage & Marina Loop (9:00 AM - 6:30 PM)</p>
+                <div style="height:150px; background:#ced4da; margin:10px 0; display:flex; align-items:center; justify-content:center;">[Placeholder: Route Map Image]</div>
+                <p style="font-size:0.9em; margin-bottom:20px;">*The full itinerary will be available on your dashboard.*</p>
+            </div>
+            <div class="nav-buttons">
+                <a href="#" class="btn-action btn-secondary" onclick="navigate('p-online-transport'); return false;">← Back to Transport</a>
+                <button type="submit" class="btn-action btn-danger">Confirm Itinerary & Proceed</button>
+            </div>
+        </form>
+    </div>
+    <div id="p-online-itinerary-confirm" class="page-view">
+        <header class="header"><h1>Tourist Corner</h1></header>
+        <form onsubmit="navigate('p-payment'); return false;">
+            <h2>Final Review & Confirm</h2>
+            <div class="review-card">
+                <h3>Summary</h3>
+                <div class="detail-row"><span>Destination:</span> <span>Chennai, India</span></div>
+                <div class="detail-row"><span>Accommodation:</span> <span>The Grand Legacy</span></div>
+                <div class="detail-row"><span>Itinerary:</span> <span>**CONFIRMED**</span></div>
+            </div>
+            <div class="agreement"><input type="checkbox" required>I confirm all details are correct.</div>
+            <div class="nav-buttons">
+                <a href="#" class="btn-action btn-secondary" onclick="navigate('p-online-itinerary-suggest'); return false;">← Edit Route</a>
+                <button type="submit" class="btn-action btn-danger">Confirm & Proceed to Payment</button>
+            </div>
+        </form>
+    </div>
+    <div id="p-payment" class="page-view">
+        <header class="header"><h1>Tourist Corner</h1></header>
+        <form onsubmit="navigate('p-ticket-delivery'); return false;">
+            <h2>Finalize Payment</h2>
+            <div class="summary-box">
+                <h3>Billing Summary</h3>
+                <div class="total-row"><span>TOTAL DUE TODAY:</span> <span>$2,950.00</span></div>
+            </div>
+            <div class="input-group"><label>Card Number</label><input type="text" placeholder="xxxx xxxx xxxx xxxx" required></div>
+            <div class="grid-2">
+                <div class="input-group"><label>Expiry (MM/YY)</label><input type="text" required></div>
+                <div class="input-group"><label>CVV</label><input type="text" required></div>
+            </div>
+            <button type="submit" class="btn-action btn-primary" style="width:100%;">Pay $2,950.00 & Confirm</button>
+        </form>
+    </div>
+    <div id="p-offline-step1" class="page-view">
+        <header class="header"><h1>Tourist Corner</h1></header>
+        <form onsubmit="navigate('p-offline-step2'); return false;">
+            <h2>Offline Booking: Trip Details</h2>
+            <div class="input-group"><label>Primary Destination</label><input type="text" required></div>
+            <div class="input-group"><label>Preferred Travel Season</label><input type="text"></div>
+            <div class="nav-buttons">
+                <a href="#" class="btn-action btn-secondary" onclick="navigate('p-services'); return false;">← Back to Services</a>
+                <button type="submit" class="btn-action btn-info">Next: Traveler Info</button>
+            </div>
+        </form>
+    </div>
+    <div id="p-offline-step2" class="page-view">
+        <header class="header"><h1>Tourist Corner</h1></header>
+        <form onsubmit="navigate('p-offline-slot'); return false;">
+            <h2>Offline Booking: Traveler & Duration</h2>
+            <div class="grid-2">
+                <div class="input-group"><label>Number of Adults</label><input type="number" required></div>
+                <div class="input-group"><label>Total Number of Days</label><input type="number" required></div>
+            </div>
+            <div class="nav-buttons">
+                <a href="#" class="btn-action btn-secondary" onclick="navigate('p-offline-step1'); return false;">← Back</a>
+                <button type="submit" class="btn-action btn-info">Next: Schedule Call</button>
+            </div>
+        </form>
+    </div>
+    <div id="p-offline-slot" class="page-view">
+        <header class="header"><h1>Tourist Corner</h1></header>
+        <form onsubmit="navigate('p-ticket-delivery'); return false;">
+            <h2>Offline Booking: Schedule Agent Call</h2>
+            <div class="input-group"><label>Preferred Date</label><input type="date" required></div>
+            <div class="input-group"><label>Contact Phone Number</label><input type="tel" required></div>
+            <div class="nav-buttons">
+                <a href="#" class="btn-action btn-secondary" onclick="navigate('p-offline-step2'); return false;">← Back</a>
+                <button type="submit" class="btn-action btn-primary">Confirm Slot & Submit Request</button>
+            </div>
+        </form>
+    </div>
+    <div id="p-ticket-delivery" class="page-view">
+        <header class="header"><h1>Tourist Corner</h1></header>
+        <div class="success-box">
+            <h2>🎉 Booking Complete!</h2>
+            <span class="confirmation-id">Confirmation ID: TC-483756</span>
+        </div>
+        <div style="text-align:center;">
+            <p>All documents have been sent to your email.</p>
+            <a href="#" class="btn-action btn-danger" style="margin-top:20px;">⬇️ Download E-Tickets (PDF)</a>
+            <a href="#" class="btn-action btn-secondary" style="margin-top:20px;" onclick="navigate('p-dashboard'); return false;">Go to Dashboard</a>
+        </div>
+    </div>
+    <div id="p-dashboard" class="page-view">
+        <header class="header"><h1>Tourist Corner Dashboard</h1></header>
+        <div style="text-align:center;">
+            <h2 style="color:#007bff;">🌍 Happy Traveling!</h2>
+            <p style="margin-top:10px;">Your journey begins now. Explore your options below.</p>
+            <div class="card-grid" style="margin-top:30px;">
+                <a href="#" class="btn-action btn-secondary" style="width:100%;" onclick="navigate('p-services'); return false;">Plan a New Trip</a>
+                <a href="#" class="btn-action btn-secondary" style="width:100%;">View My Trips</a>
+            </div>
+            <a href="#" class="btn-action btn-info" style="margin-top:20px;" onclick="navigate('p-login'); return false;">Logout</a>
+        </div>
+    </div>
+    </div>
+
+<script>
+    const pages = document.querySelectorAll('.page-view');
+    
+    // Function to hide all pages and show the target page
+    function navigate(targetId) {
+        let targetPage = document.getElementById(targetId);
+        
+        pages.forEach(page => {
+            page.classList.remove('active');
+        });
+        
+        if (targetPage) {
+            targetPage.classList.add('active');
+            window.scrollTo(0, 0); // Scroll to top on navigation
+        }
+        
+        // Handle initial login/register form visibility when navigating to the start
+        if (targetId === 'p-login') {
+            switchForm('login');
+        }
+    }
+    
+    // Function to switch between Login and Register tabs
+    function switchForm(formType) {
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const loginTab = document.getElementById('login-tab');
+        const registerTab = document.getElementById('register-tab');
+        
+        if (formType === 'login') {
+            loginForm.classList.add('active');
+            registerForm.classList.remove('active');
+            loginTab.classList.add('active');
+            registerTab.classList.remove('active');
+        } else {
+            loginForm.classList.remove('active');
+            registerForm.classList.add('active');
+            loginTab.classList.remove('active');
+            registerTab.classList.add('active');
+        }
+    }
+
+    // Initialize the starting view
+    document.addEventListener('DOMContentLoaded', () => {
+        // Ensure only the login page is active on load
+        navigate('p-login');
+        switchForm('login');
+    });
+</script>
+</body>
+</html>
